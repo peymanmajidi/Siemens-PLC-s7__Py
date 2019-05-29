@@ -1,0 +1,2 @@
+Exception has occurred: Error
+('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'SQL Server' : file not found (0) (SQLDriverConnect)")
