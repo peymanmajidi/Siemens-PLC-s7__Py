@@ -4,7 +4,11 @@ write and read double word on plc s7
 ## What you need
 wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
 
+![Shot](s7.jpg)
+
+
 tar -zxvf snap7-full-1.2.1.tar.gz
+
 
 cd snap7-full-1.2.1/build/unix && sudo make -f arm_v6_linux.mk all
 
