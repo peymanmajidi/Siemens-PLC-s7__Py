@@ -1,10 +1,10 @@
-# plc_read_write
+# Siemens PLC s7 | PYTHON
 write and read double word on plc s7
 
 ## What you need
 wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
 
-![Shot](s7.jpg)
+![plc](s7.jpg)
 
 
 tar -zxvf snap7-full-1.2.1.tar.gz
@@ -19,6 +19,8 @@ sudo cp ../bin/arm_v6-linux/libsnap7.so /usr/local/lib/libsnap7.so
 sudo apt-get install python3-pip
 
 sudo pip3 install python-snap7
+
+sudo ldconfig
 
 ## update soon
 
