@@ -16,4 +16,6 @@ sudo apt-get install python3-pip
 
 sudo pip3 install python-snap7
 
+## update soon
+
 
