@@ -2,25 +2,28 @@
 Simple write and read  on plc s7
 
 ## What you need
-wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
 
 ![plc](s7.jpg)
 
 
-tar -zxvf snap7-full-1.2.1.tar.gz
 
 
-cd snap7-full-1.2.1/build/unix && sudo make -f arm_v6_linux.mk all
+You should download following link:
+wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
+or I put this version on OS/ folder
 
-sudo cp ../bin/arm_v6-linux/libsnap7.so /usr/lib/libsnap7.so
+On Debian-base Oses:
+    tar -zxvf snap7-full-1.2.1.tar.gz
+    cd snap7-full-1.2.1/build/unix && sudo make -f arm_v6_linux.mk all
+    sudo cp ../bin/arm_v6-linux/libsnap7.so /usr/lib/libsnap7.so
+    sudo cp ../bin/arm_v6-linux/libsnap7.so /usr/local/lib/libsnap7.so
+    sudo apt-get install python3-pip
+    sudo pip3 install python-snap7
+    sudo ldconfig
 
-sudo cp ../bin/arm_v6-linux/libsnap7.so /usr/local/lib/libsnap7.so
+On Windows Only copy files on OS/ folder to System32 folder
+Here is the code:
 
-sudo apt-get install python3-pip
-
-sudo pip3 install python-snap7
-
-sudo ldconfig
 
 
     import snap7
