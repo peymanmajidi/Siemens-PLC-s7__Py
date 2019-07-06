@@ -9,7 +9,7 @@ You should download following link:
 wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
 or I put this version on **OS/** folder
 
-- [ ] On Debian-base Oses:
+- [ ] On Debian-base OS:
 ```bash
 tar -zxvf snap7-full-1.2.1.tar.gz
 cd snap7-full-1.2.1/build/unix && sudo make -f arm_v6_linux.mk all
