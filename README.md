@@ -44,6 +44,6 @@ bit = snap7.util.get_bool(temp,0,1)     # Convert to bit
 print(f"counter:{counter}\tmain:{maincounter}\tbit:{bit}")
 ```
 
-<span style="color:red">Happy Codding</span>
+<span style="color:red">Happy Codding 🍓</span>
 
-> Peyman Majidi
+> Peyman Majidi 
