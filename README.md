@@ -7,7 +7,7 @@ Simple write and read  on plc s7
 
 You should download following link:
 wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
-or I put this version on **OS/** folder
+or I put this version on 📂**OS/** 
 
 - [ ] On Debian-base OS:
 ```bash
@@ -20,7 +20,7 @@ sudo pip3 install python-snap7
 sudo ldconfig
 ```
 
-- [ ] On Windows Only copy files on **OS/** folder to System32 folder
+- [ ] On Windows Only copy files on 📂**OS/** to System32 folder
 Here is the code:
 
 ```python
