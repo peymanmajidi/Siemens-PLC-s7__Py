@@ -3,7 +3,7 @@ Simple write and read  on plc s7
 
 ## What you need
 
-![plc](s7.jpg)
+![plc](Modules/s7.jpg)
 
 You should download following link:
 wget http://sourceforge.net/projects/snap7/files/1.2.1/snap7-full-1.2.1.tar.gz/download
@@ -39,6 +39,8 @@ tsql -H 192.168.2.82 -U 'sa' -P '123456789' -p 1433
 ```
 ### List all of the tables
 sp_help # end withs 'user table'
+or you can use Sql Server Operation Studio
+[Microsoft SQLSOS Dowload Link](https://docs.microsoft.com/en-us/sql/azure-data-studio/download?view=sql-server-linux-2017)
 
 ## Mount a network folder (windows share)
 ```bash

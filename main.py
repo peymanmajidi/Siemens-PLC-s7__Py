@@ -1,54 +1,67 @@
-import snap7
-import subprocess
-import time as t
+import socket
 import pyodbc
+import subprocess as shell
+import snap7
+import time as t
 import threading
+import datetime
 
-city = 1
+HOST = '192.168.2.75'  # Standard loopback interface address (localhost)
+PORT = 2020             # Port to listen on (non-privileged ports are > 1023)
+REJECT = 24
 
+# Specifying the ODBC driver, server name, database, etc. directly
+print("Connecting...")
+cnxn = pyodbc.connect(driver = "{FreeTDS}", server = "192.168.2.41", port = 1433, database="prototypedb", user="sa", password="server@1314")
+print("Connected")
+cursor = cnxn.cursor()
 
 
 plc = snap7.client.Client()
 plc.connect('192.168.2.100', 0, 1)
 
-me = 0
-last = 0
-lastsub = 0
 
-zero = bytearray(4)
-plc.db_write(1,0,zero)
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    try: 
+        s.bind((HOST, PORT))
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            print('Connected by', addr)
+            while True:
+                city = "Reject"
+                barcode = "< NO DATA >"
+                gate = REJECT
+                datalogic_back = conn.recv(1024).decode()
+                datalogic_back= str(datalogic_back).upper().replace("\r\n","").replace("\x02","")
+                if len(datalogic_back) > 3: # something happend ------------------------------
+                    sortTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    if "NO READ" in datalogic_back:
+                        pass
+                    else:
+                        cursor = cnxn.cursor()
+                        q = f"SELECT * FROM dbo.ImportsTBL WHERE barcode='{datalogic_back}'"
+                        cursor.execute(q)
+                        row = cursor.fetchall()
+                        if len(row) > 0:
+                            gate = row[0].gate
+                            city = row[0].city
+                            barcode = datalogic_back
+                        else: # mazad
+                            gate = REJECT
+                            city = "No Where"
+                            barcode = datalogic_back
 
-while True:
-    temp = plc.db_read(1,0,4)               # DB1.DBD0 
-    counter = snap7.util.get_int(temp,2)    # Convert to int
-    temp = plc.db_read(1,4,4)               # DB1.DBD4
-    maincounter = snap7.util.get_int(temp,2)# Convert to int
-    temp = plc.db_read(1,8,2)               # DB1.DBX8.0
-    bit = snap7.util.get_int(temp,0)        
-    bit = bit > 0                          # Convert to bit
- 
-    if last == counter:
-        continue
-
-
-    now = t.time()
-    last = counter
-
-
-    me += 1
-
-    if me > 1000: 
-        me = 1
-    sub = counter - me
-    if sub != lastsub:
-        print("boom!!")
-        lastsub = sub
-    
-    future = t.time()
-    stopwatch = future - now
-    print(f"PLC:{counter}\t\tPC:{me}\t\tsub:{sub}\t\t   time={stopwatch:.5f}ms \r", end='', flush= True)
-
-    # print(f"counter:{counter}           main:{maincounter}             bit:{bit}    \r ", end='', flush=True)
+                    insert_query = f"INSERT INTO dbo.GateParcelsListTBL (gatedefid,barcode,[timestamp],gatenumber)  VALUES({gate},'{barcode}','{sortTime}',{gate})"
+                    cursor.execute(insert_query)
+                    cnxn.commit()
+                    print(f"city: {city}({gate})\tbarcode: {barcode}\tTime: {sortTime}")
+                    plc.db_write(1,0, bytearray([0,0,0, gate]))
+                # ------------------------------------------------------------------------
+                
+    except OSError:
+        print("Program is running...")
+        print("First stop it, try again")
 
 
 
