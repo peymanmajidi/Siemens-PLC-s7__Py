@@ -6,18 +6,6 @@ import threading
 
 city = 1
 
-def database():
-    global city
-    cnxn = pyodbc.connect(driver = "{FreeTDS}", server = "192.168.2.82", port = 1433, database="prototypedb", user="sa", password="server@1314")
-    cursor = cnxn.cursor()
-    t.sleep(2)
-
-    query = f"SELECT * FROM [BarcodesTBL] where how  = {0}"
-    cursor.execute(query)
-    barcode = cursor.fetchall()[0]
-    city+=1
-    cursor.execute(f"insert into ParcelsTBL values( '{barcode.barcode}','{city}',{counter})")
-    cnxn.commit()
 
 
 plc = snap7.client.Client()
@@ -46,8 +34,6 @@ while True:
     now = t.time()
     last = counter
 
-    x = threading.Thread(target=database)
-    x.start()
 
     me += 1
 

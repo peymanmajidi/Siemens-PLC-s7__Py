@@ -32,6 +32,20 @@ plc.connect('192.168.2.100', 0, 1)
 
 ```
 
+
+## How to Connect to SQL server via Command line (shell)
+```bash
+tsql -H 192.168.2.82 -U 'sa' -P '123456789' -p 1433
+```
+### List all of the tables
+sp_help # end withs 'user table'
+
+## Mount a network folder (windows share)
+```bash
+sudo mount -t cifs 192.168.2.82 ./path/to/mount/ -o username=user,password=1
+```
+
+
 <span style="color:red">Happy Codding 🍓</span>
 
 > Peyman Majidi 

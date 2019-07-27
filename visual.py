@@ -6,7 +6,7 @@ import threading
 import logo
 
 city = 1
-logo.print_logo()
+logo.print_logo() # ~PRINT LOGO 
 
 
 def database():
@@ -52,7 +52,7 @@ while True:
     x = threading.Thread(target=database)
     x.start()
 
-    me += 1
+    me += 1 # plus my counter
 
     if me > 1000: 
         me = 1
