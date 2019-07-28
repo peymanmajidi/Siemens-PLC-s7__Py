@@ -27,8 +27,8 @@ def FirstOrDefault(table, keyword, key):
     cursor.execute(q)
     data = cursor.fetchall()
     if len(data) > 0:
-        return data[0]
-    return False
+        return True, data[0]
+    return False, None
 
 
 
@@ -53,17 +53,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     if DATALOGIC_NO_READ in datalogic_back:
                         pass
                     else:
-                        cursor = db.cursor()
-                        q = f"SELECT * FROM ImportsTBL WHERE barcode='{datalogic_back}'"
-                        cursor.execute(q)
-                        excel = cursor.fetchall()
-                        if len(excel) > 0:
-                            city = excel[0].city
-                            q = f"SELECT * FROM GateDefsTBL WHERE city='{city}'"
-                            cursor.execute(q)
-                            gate_def = cursor.fetchall()
-                            if len(gate_def) > 0:
-                                gate = gate_def[0].gateNumber
+                        success, excel = FirstOrDefault(table="ImportsTBL", keyword="barcode", key=datalogic_back)
+                        if success:
+                            city = excel.city
+                            success, gate_def = FirstOrDefault(table="GateDefsTBL" , keyword="city" , key=city)
+                            if success:
+                                gate = gate_def.gateNumber
                             barcode = datalogic_back
                         else: # mazad
                             city = "NO EXCEL(Rj)"
