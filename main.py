@@ -5,57 +5,61 @@ import snap7
 import time as t
 import threading
 import datetime
-import Modules.logo as logo
 
-HOST = '192.168.2.75'  # Standard loopback interface address (localhost)
-PORT = 2020            # Port to listen on (non-privileged ports are > 1023)
-REJECT = 24
+from config import *
+import Interface
+
+
+Interface.Logo()
 row_number = 0
-logo.print_logo()
-# Specifying the ODBC driver, server name, database, etc. directly
 print("Connecting...")
-cnxn = pyodbc.connect(driver = "{FreeTDS}", server = "192.168.2.41", port = 1433, database="prototypedb", user="sa", password="server@1314")
+db = pyodbc.connect(driver = "{FreeTDS}", server = DATABASE_IP, port = 1433, database=DB_NAME, user=DB_USERNAME, password=DB_PASSWORD)
 print("Connected")
-cursor = cnxn.cursor()
-
+cursor = db.cursor()
 plc = snap7.client.Client()
-plc.connect('192.168.2.100', 0, 1)
+plc.connect(PLC_IP, 0, 1)
+
+
+def FirstOrDefault(table, keyword, key):
+    global db
+    cursor = db.cursor()
+    q = f"SELECT * FROM {table} WHERE {keyword}='{key}'"
+    cursor.execute(q)
+    data = cursor.fetchall()
+    if len(data) > 0:
+        return data[0]
+    return False
 
 
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     try: 
-        s.bind((HOST, PORT))
+        s.bind((HOST_IP, PORT))
         s.listen()
         conn, addr = s.accept()
         with conn:
             print('Connected by', addr)
-            print("""
-┌───────┬──────────────────┬─────────────────────────┬──────────────┬───────────────────────┐
-│  #    │       CITY       │          BARCODE        │     GATE     │      TIME STAMP       │
-├───────┼──────────────────┼─────────────────────────┼──────────────┼───────────────────────┤
-└───────┴──────────────────┴─────────────────────────┴──────────────┴───────────────────────┘\r""",end = '')
-
+            Interface.Init()
             while True:
                 row_number+=1
-                city = "Reject"
-                barcode = "** NO BARCODE **"
-                gate = REJECT
+                city = REJECT_TITLE
+                barcode = NO_BARCODE
+                gate = REJECT_GATE
                 datalogic_back = conn.recv(1024).decode()
                 datalogic_back= str(datalogic_back).upper().replace("\r\n","").replace("\x02","")
                 if len(datalogic_back) > 3: # something happend ------------------------------
                     sortTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    if "NO READ" in datalogic_back:
+                    if DATALOGIC_NO_READ in datalogic_back:
                         pass
                     else:
-                        cursor = cnxn.cursor()
-                        q = f"SELECT * FROM dbo.ImportsTBL WHERE barcode='{datalogic_back}'"
+                        cursor = db.cursor()
+                        q = f"SELECT * FROM ImportsTBL WHERE barcode='{datalogic_back}'"
                         cursor.execute(q)
                         excel = cursor.fetchall()
                         if len(excel) > 0:
                             city = excel[0].city
-                            q = f"SELECT * FROM dbo.GateDefsTBL WHERE city='{city}'"
+                            q = f"SELECT * FROM GateDefsTBL WHERE city='{city}'"
                             cursor.execute(q)
                             gate_def = cursor.fetchall()
                             if len(gate_def) > 0:
@@ -65,19 +69,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             city = "NO EXCEL(Rj)"
                             barcode = datalogic_back
 
-                    insert_query = f"""INSERT INTO dbo.GateParcelsListTBL (gatedefid,barcode,[timestamp],gatenumber) 
+                    insert_query = f"""INSERT INTO GateParcelsListTBL (gatedefid,barcode,[timestamp],gatenumber) 
                      VALUES({gate},'{barcode}','{sortTime}',{gate})"""
                     cursor.execute(insert_query)
-                    cnxn.commit()
-                    gate_str = str(gate) if gate >9 else "0" + str(gate)
-                    row = f"│  #    │       CITY       │          BARCODE        │     GATE     │      TIME STAMP       │"
-                    row = row[:2] + str(row_number) + ((5-len(str(row_number)))* ' ') + row[7:]
-                    row = row[:10] + city + ((17 - len(city))* ' ') + row[27:]
-                    row = row[:30] + barcode + ((22 - len(barcode))* ' ') + row[52:]
-                    row = row[:59] + gate_str + ((8 - len(gate_str))* ' ') + row[67:]
-                    row = row[:71] + sortTime + ((21 - len(sortTime))* ' ') + row[92:]
-                    print( row)
-                    print("└───────┴──────────────────┴─────────────────────────┴──────────────┴───────────────────────┘\r",end = '')
+                    db.commit()
+                    Interface.Print_Row(i=row_number,gate= gate, city=city, barcode=barcode, sortTime = sortTime )
                     plc.db_write(1,0, bytearray([0,0,0, gate]))
                 # ------------------------------------------------------------------------                
     except OSError:

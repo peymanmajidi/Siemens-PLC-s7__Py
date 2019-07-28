@@ -1,7 +1,7 @@
 import snap7
 import subprocess
 import time as t
-import pyodbc
+import db
 import threading
 
 city = 1
