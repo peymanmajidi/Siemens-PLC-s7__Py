@@ -46,7 +46,7 @@ or you can use Sql Server Operation Studio
 ```bash
 sudo mount -t cifs 192.168.2.82 ./path/to/mount/ -o username=user,password=1
 ```
-
+![Screenshot](Modules/shot.png))
 
 <span style="color:red">Happy Codding 🍓</span>
 

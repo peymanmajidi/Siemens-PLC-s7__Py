@@ -51,34 +51,34 @@ def TCP_Listener():
             with conn:
                 print(f'Connected to {addr}')
                 interface.Init()
-                while True:
+                while True:  # LOOP THROUGH LISTENING TO TCP LISTENER DATALOGIC
                     row_number += 1
                     city = REJECT_TITLE
                     barcode = NO_BARCODE
                     gate = REJECT_GATE
-                    datalogic_back = conn.recv(1024).decode()
-                    datalogic_back = str(datalogic_back).upper().replace(
+                    dl_databack = conn.recv(1024).decode()
+                    dl_databack = str(dl_databack).upper().replace(
                         "\r\n", "").replace("\x02", "")
-                    if len(datalogic_back) > 3:  # something happend ------------------------------
+                    if len(dl_databack) > 3:  # NEW PARCEL TRIGGED ---------------------
                         sortTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        if DATALOGIC_NO_READ in datalogic_back:
+                        if DATALOGIC_NO_READ in dl_databack:  # NO BARCODE READ
                             pass
-                        else:
+                        else:                                # VALID BARCODE
                             success, excel = Select(
-                                table="ImportsTBL", keyword="barcode", key=datalogic_back)
+                                table="ImportsTBL", keyword="barcode", key=dl_databack)
                             if success:
                                 city = excel.city
                                 success, gate_def = Select(
                                     table="GateDefsTBL", keyword="city", key=city)
                                 if success:
                                     gate = gate_def.gateNumber
-                                barcode = datalogic_back
-                            else:  # mazad
+                                barcode = dl_databack
+                            else:  # THIS IS MAZAD ( NO BARCODE REFRENCE IN EXCEL)
                                 city = "NO EXCEL(Rj)"
-                                barcode = datalogic_back
+                                barcode = dl_databack
 
                         success = Insert(table="GateParcelsListTBL",
-                               cols="gatedefid,barcode,[timestamp],gatenumber", values=f"{gate},'{barcode}','{sortTime}',{gate}")
+                                         cols="gatedefid,barcode,[timestamp],gatenumber", values=f"{gate},'{barcode}','{sortTime}',{gate}")
                         interface.Print_Row(
                             i=row_number, gate=gate, city=city, barcode=barcode, sortTime=sortTime)
                         plc.db_write(1, 0, bytearray([0, 0, 0, gate]))
