@@ -44,7 +44,8 @@ or you can use Sql Server Operation Studio
 
 ## Mount a network folder (windows share)
 ```bash
-sudo mount -t cifs 192.168.2.82 ./path/to/mount/ -o username=user,password=1
+sudo apt-get install cifs-utils # only first time make sure this utility is installed
+sudo mount -t cifs //192.168.1.10/sharedfolder ./path/to/mount/ -o username=peyman,password=1234567890
 ```
 ![Screenshot](Modules/shot.png))
 
